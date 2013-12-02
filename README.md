@@ -20,20 +20,20 @@ func main() {
 	optimizer := lbfgs.NewOptimizer(10, 2)
 
 	// x为自变量，g为目标函数的偏微分向量，都是二维向量
-	x := NewVector(2)
-	g := NewVector(2)
+	x := lbfgs.NewVector(2)
+	g := lbfgs.NewVector(2)
 
 	// x初始化为(1, 0.1)
 	x.SetValues([]float32{1, 0.1})
 
 	k := 0
 	for {
-		fmt.Println("====== 第 ", k, " 次迭代")
-		fmt.Println("x = ", x)
+		fmt.Println("====== 第", k, "次迭代")
+		fmt.Println("x =", x)
 
 		// 更新偏导数向量
 		g.SetValues([]float32{2*x.Get(0), 2*x.Get(1)})
-		fmt.Println("g = ", g)
+		fmt.Println("g =", g)
 
 		// 计算x更新的步长
 		delta := optimizer.GetDeltaX(x, g)
@@ -50,6 +50,6 @@ func main() {
 
 	// 打印最终的x值
 	fmt.Println("==== 结束 ====")
-	fmt.Println("x = ", x)
+	fmt.Println("x =", x)
 }
 ```
