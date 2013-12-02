@@ -5,24 +5,21 @@ import (
 	"testing"
 )
 
-func TestLBFGS(t *testing.T) {
-	var lbfgs LBFGS
-	lbfgs.Init(10, 2)
-	var x, g Vector
-	x.Init(2)
-	g.Init(2)
-	x.Set(0, 1)
-	x.Set(1, 0.1)
+func TestOptimizer(t *testing.T) {
+	optimizer := NewOptimizer(10, 2)
+
+	x := NewVector(2)
+	g := NewVector(2)
+	x.SetValues([]float32{1, 0.1})
 
 	k := 0
 	for {
 		fmt.Println("======> k = ", k)
 		fmt.Println("x = ", x)
-		g.Set(0, 2*x.Get(0))
-		g.Set(1, 2*x.Get(1))
+		g.SetValues([]float32{2 * x.Get(0), 2 * x.Get(1)})
 		fmt.Println("g = ", g)
-		delta := lbfgs.GetDeltaX(x, g)
-		x = VecWeightedSum(x, delta, 1, 1)
+		delta := optimizer.GetDeltaX(x, g)
+		x.Increment(delta, 1)
 		if g.Norm() < 0.0001 {
 			break
 		}

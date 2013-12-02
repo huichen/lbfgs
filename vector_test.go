@@ -12,14 +12,8 @@ func Expect(t *testing.T, expect string, actual interface{}) {
 	}
 }
 
-func TestVectorInit(t *testing.T) {
-	var vec Vector
-	vec.Init(10)
-}
-
 func TestVectorSetAndGet(t *testing.T) {
-	var vec Vector
-	vec.Init(10)
+	vec := NewVector(10)
 	Expect(t, "0", vec.Get(3))
 
 	vec.Set(3, 7)
@@ -31,8 +25,7 @@ func TestVectorSetAndGet(t *testing.T) {
 }
 
 func TestVectorOpposite(t *testing.T) {
-	var vec Vector
-	vec.Init(10)
+	vec := NewVector(10)
 	vec.Set(3, 7)
 	Expect(t, "7", vec.Get(3))
 
@@ -41,10 +34,8 @@ func TestVectorOpposite(t *testing.T) {
 }
 
 func TestVectorNorm(t *testing.T) {
-	var vec Vector
-	vec.Init(2)
-	vec.Set(0, 3)
-	vec.Set(1, 4)
+	vec := NewVector(2)
+	vec.SetValues([]float32{3, 4})
 	Expect(t, "5", vec.Norm())
 }
 
@@ -56,37 +47,53 @@ func TestMod(t *testing.T) {
 }
 
 func TestVecDotProduct(t *testing.T) {
-	var vec1, vec2 Vector
-	vec1.Init(3)
-	vec2.Init(3)
-
-	vec1.Set(0, 1)
-	vec1.Set(1, 2)
-	vec1.Set(2, 3)
-
-	vec2.Set(0, 3)
-	vec2.Set(1, 4)
-	vec2.Set(2, 5)
+	vec1 := NewVector(3)
+	vec1.SetValues([]float32{1, 2, 3})
+	vec2 := NewVector(3)
+	vec2.SetValues([]float32{3, 4, 5})
 
 	// 点乘积为 1*3+2*4+3*5 = 26
 	Expect(t, "26", VecDotProduct(vec1, vec2))
 }
 
-func TestVecWeightedSum(t *testing.T) {
-	var vec1, vec2 Vector
-	vec1.Init(3)
-	vec2.Init(3)
+func TestWeightedSum(t *testing.T) {
+	vec1 := NewVector(3)
+	vec1.SetValues([]float32{1, 2, 3})
+	vec2 := NewVector(3)
+	vec2.SetValues([]float32{3, 4, 5})
 
-	vec1.Set(0, 1)
-	vec1.Set(1, 2)
-	vec1.Set(2, 3)
+	vec1.WeightedSum(vec1, vec2, 3, 4)
+	Expect(t, "15", vec1.Get(0))
+	Expect(t, "22", vec1.Get(1))
+	Expect(t, "29", vec1.Get(2))
+}
 
-	vec2.Set(0, 3)
-	vec2.Set(1, 4)
-	vec2.Set(2, 5)
+func TestDeepCopy(t *testing.T) {
+	vec1 := NewVector(3)
+	vec1.SetValues([]float32{1, 2, 3})
 
-	vec := VecWeightedSum(vec1, vec2, 3, 4)
-	Expect(t, "15", vec.Get(0))
-	Expect(t, "22", vec.Get(1))
-	Expect(t, "29", vec.Get(2))
+	// shallow copy
+	vec2 := vec1
+	Expect(t, "1", vec2.Get(0))
+	vec1.Set(0, 3)
+	Expect(t, "3", vec2.Get(0))
+
+	// deep copy
+	vec3 := NewVector(3)
+	vec3.DeepCopy(vec1)
+	Expect(t, "3", vec3.Get(0))
+	vec1.Set(0, 4)
+	Expect(t, "3", vec3.Get(0))
+}
+
+func TestIncrement(t *testing.T) {
+	vec1 := NewVector(3)
+	vec1.SetValues([]float32{1, 2, 3})
+	vec2 := NewVector(3)
+	vec2.SetValues([]float32{1, 7, 2})
+
+	vec1.Increment(vec2, 2)
+	Expect(t, "3", vec1.Get(0))
+	Expect(t, "16", vec1.Get(1))
+	Expect(t, "7", vec1.Get(2))
 }
